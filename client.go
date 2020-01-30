@@ -117,6 +117,32 @@ func (c *Client) StopLoad() (*SwarmResponse, error) {
 	return &s, nil
 }
 
+// GetStatus gets the execution metrics from locust
+// this provides error ratio, current users hatchd, state and many other defined in
+// StatsResponse structure
+func (c *Client) GetStatus() (*StatsResponse, error) {
+	s := StatsResponse{}
+	u, err := c.BaseURL.Parse("/stats/requests")
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.httpClient.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&s)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, err
+	}
+
+	return &s, nil
+}
 
 // New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
 func New(endpoint string) (*Client, error) {
