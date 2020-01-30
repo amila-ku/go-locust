@@ -92,6 +92,31 @@ func (c *Client) StartLoad(users int, hatchrate int) (*SwarmResponse, error) {
 	return &s, nil
 }
 
+// StopLoad stops an existing locust execution
+func (c *Client) StopLoad() (*SwarmResponse, error) {
+	s := SwarmResponse{}
+	u, err := c.BaseURL.Parse("/stop")
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.httpClient.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&s)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 || s.Success != true {
+		return nil, err
+	}
+
+	return &s, nil
+}
+
 
 // New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
 func New(endpoint string) (*Client, error) {
