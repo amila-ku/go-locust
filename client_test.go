@@ -57,3 +57,21 @@ func TestStartLoad(t *testing.T) {
 	assert.Equal(t, "Swarming started", s.Message)
 	assert.Equal(t, true, s.Success)
 }
+
+func TestStopLoad(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req.ParseForm()
+		fmt.Fprint(w, locustTestStoppedResponce)
+	}))
+
+	// Close the server when test finishes.
+	defer server.Close()
+
+	c, err := New(server.URL)
+	assert.Nil(t, err)
+	s, err := c.StopLoad()
+	assert.Nil(t, err)
+	assert.Equal(t, "Test stopped", s.Message)
+	assert.Equal(t, true, s.Success)
+}
+
