@@ -75,3 +75,20 @@ func TestStopLoad(t *testing.T) {
 	assert.Equal(t, true, s.Success)
 }
 
+func TestGetStatus(t *testing.T) {
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req.ParseForm()
+		fmt.Fprint(w, locustStatsResponce)
+	}))
+
+	// Close the server when test finishes.
+	defer server.Close()
+
+	client, err := New(server.URL)
+	assert.Nil(t, err)
+	s, err := client.GetStatus()
+	assert.Nil(t, err)
+	assert.Equal(t, 5, s.UserCount)
+	assert.Equal(t, "running", s.State)
+}
