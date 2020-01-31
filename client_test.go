@@ -40,3 +40,20 @@ func TestNewClientURLSetting(t *testing.T) {
 	url := c.BaseURL.String()
 	assert.Equal(t, locusturl, url)
 }
+
+func TestStartLoad(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req.ParseForm()
+		fmt.Fprint(w, locustTestStartedResponce)
+	}))
+
+	// Close the server when test finishes.
+	defer server.Close()
+
+	c, err := New(server.URL)
+	assert.Nil(t, err)
+	s, err := c.StartLoad(5, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, "Swarming started", s.Message)
+	assert.Equal(t, true, s.Success)
+}
