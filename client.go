@@ -62,7 +62,7 @@ type Error struct {
 	Error      string `json:"error"`
 	Method     string `json:"method"`
 	Name       string `json:"name"`
-	Occurences int    `json:"occurences"`
+	Occurrences int    `json:"occurrences"`
 }
 
 // StartLoad starts locust swarming or modifes if the load generation has already started,
