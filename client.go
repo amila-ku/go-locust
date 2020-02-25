@@ -2,6 +2,7 @@
 package locust
 
 import (
+	"io/ioutil"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -66,7 +67,7 @@ type Error struct {
 
 // StartLoad starts locust swarming or modifes if the load generation has already started,
 // hatch rate and number of users to simulate are inputs.
-func (c *Client) StartLoad(users int, hatchrate int) (*SwarmResponse, error) {
+func (c *Client) startLoad(users int, hatchrate int) (*SwarmResponse, error) {
 	s := SwarmResponse{}
 	u, err := c.BaseURL.Parse("/swarm")
 	if err != nil {
@@ -93,7 +94,7 @@ func (c *Client) StartLoad(users int, hatchrate int) (*SwarmResponse, error) {
 }
 
 // StopLoad stops an existing locust execution
-func (c *Client) StopLoad() (*SwarmResponse, error) {
+func (c *Client) stopLoad() (*SwarmResponse, error) {
 	s := SwarmResponse{}
 	u, err := c.BaseURL.Parse("/stop")
 	if err != nil {
@@ -117,10 +118,34 @@ func (c *Client) StopLoad() (*SwarmResponse, error) {
 	return &s, nil
 }
 
+// isReady probes reset endpoint of locust to check if the service is ready
+func (c *Client) isReady()  error {
+	u, err := c.BaseURL.Parse("/stats/reset")
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.httpClient.Get(u.String())
+	if err != nil {
+		return err
+	}
+
+	respdata, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 && string(respdata) == "ok" {
+		return err
+	}
+
+	return nil
+}
+
 // GetStatus gets the execution metrics from locust
 // this provides error ratio, current users hatchd, state and many other defined in
 // StatsResponse structure
-func (c *Client) GetStatus() (*StatsResponse, error) {
+func (c *Client) getStatus() (*StatsResponse, error) {
 	s := StatsResponse{}
 	u, err := c.BaseURL.Parse("/stats/requests")
 	if err != nil {
