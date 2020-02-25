@@ -2,9 +2,9 @@
 package locust
 
 import (
-	"io/ioutil"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -59,9 +59,9 @@ type Stat struct {
 // Error defines structure of error records in locust stats from locust stats endpoint,
 // this is part of StatsResponse
 type Error struct {
-	Error      string `json:"error"`
-	Method     string `json:"method"`
-	Name       string `json:"name"`
+	Error       string `json:"error"`
+	Method      string `json:"method"`
+	Name        string `json:"name"`
 	Occurrences int    `json:"occurrences"`
 }
 
@@ -119,7 +119,7 @@ func (c *Client) stopLoad() (*SwarmResponse, error) {
 }
 
 // isReady probes reset endpoint of locust to check if the service is ready
-func (c *Client) isReady()  error {
+func (c *Client) isReady() error {
 	u, err := c.BaseURL.Parse("/stats/reset")
 	if err != nil {
 		return err
