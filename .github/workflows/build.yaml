@@ -16,5 +16,8 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
 
+    - name: Lint
+      run: golint .; gofmt -s .
+
     - name: Build
       run: go test -v; go build -v .
