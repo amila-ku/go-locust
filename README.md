@@ -6,7 +6,7 @@
 
 go-locust-client is a library to control a locust deployment and get statistics. This is client allows to start/stop a locust load test and ramp up load test.
 
-Currently, go-locust-client requires Go version 1.13 or greater. I will try my best to test with older versions of Go, but due time constraints, I  haven't test with older versions.
+Currently, go-locust-client requires Go version 1.13 or greater and Locust 0.14 or higher. I will try my best to test with older versions of Go and Locust, but due time constraints, I haven't tested with older versions.
 
 This does not process client stats and presents information as it is.
 
@@ -74,6 +74,26 @@ func main(){
 
 Library go-locust-client will not directly handle authentication. When creating http client configure http.Client to handle authentication for you. 
 Check https://github.com/golang/oauth2 for implementation
+
+
+## Run Locust
+
+install locust 
+
+```
+
+pip3 install locust
+
+```
+
+and configure loadtest file as described here https://docs.locust.io/en/stable/quickstart.html
+
+
+```
+
+locust -f locust_files/my_locust_file.py
+
+```
 
 ## To Do
 
