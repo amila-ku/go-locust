@@ -25,9 +25,11 @@ This does not process client stats and presents information as it is.
 
 ```
 
-HostUrl : locust endpoiint to connect to, ex : http://locust.loadenv.io:8089
-Users : Number of users to simulate
-HatchRate : How many users to be added per second
+* HostUrl : locust endpoiint to connect to, ex : http://locust.loadenv.io:8089
+
+* Users : Number of users to simulate
+
+* HatchRate : How many users to be added per second
 
 
 complete example:
