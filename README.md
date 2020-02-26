@@ -12,6 +12,67 @@ This does not process client stats and presents information as it is.
 
 ## Usage 
 
+```
+
+	client, err := lc.New(HostUrl)
+	if err != nil {
+		return err
+	}
+	_, err = client.StartLoad(Users, HatchRate)
+	if err != nil {
+		return err
+	}
+
+```
+
+HostUrl : locust endpoiint to connect to, ex : http://locust.loadenv.io:8089
+Users : Number of users to simulate
+HatchRate : How many users to be added per second
+
+
+complete example:
+
+```
+package main 
+
+import (
+    lc "github.com/amila-ku/locust-client"
+)
+
+func main(){
+
+    // create new client and check for errors
+	client, err := lc.New(HostUrl)
+	if err != nil {
+		return err
+	}
+
+    // start load generation
+	_, err = client.startLoad(Users, HatchRate)
+	if err != nil {
+		return err
+	}
+
+    // stop load generation
+	_, err = client.stopLoad()
+	if err != nil {
+		return err
+	}
+
+    // get loadtest status
+	_, err = client.getStatus()
+	if err != nil {
+		return err
+	}
+}
+
+```
+
+## Authintication
+
+Library go-locust-client will not directly handle authentication. When creating http client configure http.Client to handle authentication for you. 
+Check https://github.com/golang/oauth2 for implementation
+
 ## To Do
 
 * add example
