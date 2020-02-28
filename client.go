@@ -169,6 +169,11 @@ func (c *Client) getStatus() (*StatsResponse, error) {
 	return &s, nil
 }
 
+//swarm handles load test when given maximum requests per rate and ramp up time.
+func (c *Client) swarm(rps int, ramptime string) (*StatsResponse, error) {
+
+}
+
 // New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
 func New(endpoint string) (*Client, error) {
 	u, err := url.Parse(endpoint)
