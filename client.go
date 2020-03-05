@@ -67,7 +67,7 @@ type Error struct {
 
 // StartLoad starts locust swarming or modifes if the load generation has already started,
 // hatch rate and number of users to simulate are inputs.
-func (c *Client) startLoad(users int, hatchrate int) (*SwarmResponse, error) {
+func (c *Client) generateLoad(users int, hatchrate int) (*SwarmResponse, error) {
 	s := SwarmResponse{}
 	u, err := c.BaseURL.Parse("/swarm")
 	if err != nil {
@@ -170,7 +170,28 @@ func (c *Client) getStatus() (*StatsResponse, error) {
 }
 
 //swarm handles load test when given maximum requests per rate and ramp up time.
-func (c *Client) swarm(rps int, ramptime string) (*StatsResponse, error) {
+func (c *Client) swarm(rps int, ramptime string, duration string) (*StatsResponse, error) {
+	// check if the locust is ready
+	if err := c.isReady() != nil {
+		return err
+	}
+
+	userCount := 10
+	hatchRate := 1
+	targetRps := rps
+	currentRps := 0
+	loadtestDuration, err := time.ParseDuration(duration)
+
+	if err := nil {
+		loadtestDuration, _ = time.ParseDuration("1h")
+	}
+
+	for  currentRps < targetRps  {
+		
+		c.generateLoad(userCount, hatchRate)
+
+		// user calculation logic needs to be added
+	}
 
 }
 
