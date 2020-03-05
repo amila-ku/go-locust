@@ -195,6 +195,11 @@ func (c *Client) swarm(rps int, ramptime string, duration string) (*StatsRespons
 
 }
 
+// calculate users required for rps
+func calculateUsersTarget(targetrps int, currentrps int, currentusers int ) int {
+    return targetrps / ( currentrps / currentusers )
+}
+
 // New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
 func New(endpoint string) (*Client, error) {
 	u, err := url.Parse(endpoint)
