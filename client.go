@@ -67,14 +67,14 @@ type Error struct {
 
 // StartLoad starts locust swarming or modifes if the load generation has already started,
 // hatch rate and number of users to simulate are inputs.
-func (c *Client) generateLoad(users int, hatchrate int) (*SwarmResponse, error) {
+func (c *Client) generateLoad(users int, hatchrate float64) (*SwarmResponse, error) {
 	s := SwarmResponse{}
 	u, err := c.BaseURL.Parse("/swarm")
 	if err != nil {
 		return nil, err
 	}
 	// sets payload for post as hatch rate and user count
-	data := url.Values{"locust_count": {strconv.Itoa(users)}, "hatch_rate": {strconv.Itoa(hatchrate)}}
+	data := url.Values{"locust_count": {strconv.Itoa(users)}, "hatch_rate": {strconv.FormatFloat(hatchrate, 'E', -1, 32)}}
 
 	resp, err := c.httpClient.PostForm(u.String(), data)
 	if err != nil {
@@ -145,7 +145,7 @@ func (c *Client) isReady() error {
 // GetStatus gets the execution metrics from locust
 // this provides error ratio, current users hatchd, state and many other defined in
 // StatsResponse structure
-func (c *Client) getStatus() (*StatsResponse, error) {
+func (c *Client) getStats() (*StatsResponse, error) {
 	s := StatsResponse{}
 	u, err := c.BaseURL.Parse("/stats/requests")
 	if err != nil {
@@ -169,29 +169,68 @@ func (c *Client) getStatus() (*StatsResponse, error) {
 	return &s, nil
 }
 
-//swarm handles load test when given maximum requests per rate and ramp up time.
-func (c *Client) swarm(rps int, ramptime string, duration string) (*StatsResponse, error) {
+func (c *Client) totalRps() (float64, error) {
+	s, err := c.getStats()
+	if err != nil {
+		return s.TotalRps, err
+	}
+	return s.TotalRps,err
+}
+
+//swarm handles load test when given maximum requests rate and ramp up time.
+func (c *Client) swarm(rps float64, duration string) (string, error) {
 	// check if the locust is ready
-	if err := c.isReady() != nil {
-		return err
+	if err := c.isReady(); err != nil {
+		return "", err
 	}
 
-	userCount := 10
-	hatchRate := 1
+	userCount := 1
+	hatchRate := 0.1
 	targetRps := rps
-	currentRps := 0
 	loadtestDuration, err := time.ParseDuration(duration)
 
-	if err := nil {
+	if err != nil {
 		loadtestDuration, _ = time.ParseDuration("1h")
 	}
 
+	// generate load with 1 user to identify rps, this will be used to calculate rps later.
+	c.generateLoad(userCount, hatchRate)
+
+	/// get rps for 1 user
+	initrps, err := c.totalRps()
+	if err != nil {
+		return "",err
+	}
+	currentRps := initrps
+
+	// timed wait and start ramping up load untill expected rps
+
 	for  currentRps < targetRps  {
-		
+		userCount =+ 10
 		c.generateLoad(userCount, hatchRate)
 
-		// user calculation logic needs to be added
+		// get rps for current execution 
+		r, err := c.totalRps()
+		if err != nil {
+			return "", err
+		}
+
+		for r < rps * float64(userCount)/2 {
+			// get rps for current number of usrs, sleep for two seconds if not expected rps is achive
+			r, err = c.totalRps()
+			if err != nil {
+				return "", err
+			}
+			time.Sleep(2 * time.Second)
+		}
+
+		// if time exceeds stop load test
+		fmt.Println(loadtestDuration)
+
+
 	}
+
+	return "run", nil
 
 }
 
