@@ -174,7 +174,7 @@ func (c *Client) totalRps() (float64, error) {
 	if err != nil {
 		return s.TotalRps, err
 	}
-	return s.TotalRps,err
+	return s.TotalRps, err
 }
 
 //swarm handles load test when given maximum requests rate and ramp up time.
@@ -199,23 +199,23 @@ func (c *Client) swarm(rps float64, duration string) (string, error) {
 	/// get rps for 1 user
 	initrps, err := c.totalRps()
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	currentRps := initrps
 
 	// timed wait and start ramping up load untill expected rps
 
-	for  currentRps < targetRps  {
-		userCount =+ 10
+	for currentRps < targetRps {
+		userCount = +10
 		c.generateLoad(userCount, hatchRate)
 
-		// get rps for current execution 
+		// get rps for current execution
 		r, err := c.totalRps()
 		if err != nil {
 			return "", err
 		}
 
-		for r < rps * float64(userCount)/2 {
+		for r < rps*float64(userCount)/2 {
 			// get rps for current number of usrs, sleep for two seconds if not expected rps is achive
 			r, err = c.totalRps()
 			if err != nil {
@@ -227,7 +227,6 @@ func (c *Client) swarm(rps float64, duration string) (string, error) {
 		// if time exceeds stop load test
 		fmt.Println(loadtestDuration)
 
-
 	}
 
 	return "run", nil
@@ -235,8 +234,8 @@ func (c *Client) swarm(rps float64, duration string) (string, error) {
 }
 
 // calculate users required for rps
-func calculateUsersTarget(targetrps int, currentrps int, currentusers int ) int {
-    return targetrps / ( currentrps / currentusers )
+func calculateUsersTarget(targetrps int, currentrps int, currentusers int) int {
+	return targetrps / (currentrps / currentusers)
 }
 
 // New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
