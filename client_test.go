@@ -52,7 +52,7 @@ func TestStartLoad(t *testing.T) {
 
 	c, err := New(server.URL)
 	assert.Nil(t, err)
-	s, err := c.generateLoad(5, 1)
+	s, err := c.GenerateLoad(5, 1)
 	assert.Nil(t, err)
 	assert.Equal(t, "Swarming started", s.Message)
 	assert.Equal(t, true, s.Success)
@@ -69,7 +69,7 @@ func TestStopLoad(t *testing.T) {
 
 	c, err := New(server.URL)
 	assert.Nil(t, err)
-	s, err := c.stopLoad()
+	s, err := c.StopLoad()
 	assert.Nil(t, err)
 	assert.Equal(t, "Test stopped", s.Message)
 	assert.Equal(t, true, s.Success)
@@ -87,7 +87,7 @@ func TestGetStatus(t *testing.T) {
 
 	client, err := New(server.URL)
 	assert.Nil(t, err)
-	s, err := client.getStats()
+	s, err := client.Stats()
 	assert.Nil(t, err)
 	assert.Equal(t, 5, s.UserCount)
 	assert.Equal(t, "running", s.State)

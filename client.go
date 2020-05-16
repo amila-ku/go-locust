@@ -65,9 +65,9 @@ type Error struct {
 	Occurrences int    `json:"occurrences"`
 }
 
-// StartLoad starts locust swarming or modifes if the load generation has already started,
+// GenerateLoad starts locust swarming or modifes if the load generation has already started,
 // hatch rate and number of users to simulate are inputs.
-func (c *Client) generateLoad(users int, hatchrate float64) (*SwarmResponse, error) {
+func (c *Client) GenerateLoad(users int, hatchrate float64) (*SwarmResponse, error) {
 	s := SwarmResponse{}
 	u, err := c.BaseURL.Parse("/swarm")
 	if err != nil {
@@ -94,7 +94,7 @@ func (c *Client) generateLoad(users int, hatchrate float64) (*SwarmResponse, err
 }
 
 // StopLoad stops an existing locust execution
-func (c *Client) stopLoad() (*SwarmResponse, error) {
+func (c *Client) StopLoad() (*SwarmResponse, error) {
 	s := SwarmResponse{}
 	u, err := c.BaseURL.Parse("/stop")
 	if err != nil {
@@ -142,10 +142,10 @@ func (c *Client) isReady() error {
 	return nil
 }
 
-// GetStatus gets the execution metrics from locust
+// Stats gets the execution metrics from locust
 // this provides error ratio, current users hatchd, state and many other defined in
 // StatsResponse structure
-func (c *Client) getStats() (*StatsResponse, error) {
+func (c *Client) Stats() (*StatsResponse, error) {
 	s := StatsResponse{}
 	u, err := c.BaseURL.Parse("/stats/requests")
 	if err != nil {
@@ -169,19 +169,19 @@ func (c *Client) getStats() (*StatsResponse, error) {
 	return &s, nil
 }
 
-func (c *Client) totalRps() (float64, error) {
-	s, err := c.getStats()
+func (c *Client) getCurrentRps() (float64, error) {
+	s, err := c.Stats()
 	if err != nil {
 		return s.TotalRps, err
 	}
 	return s.TotalRps, err
 }
 
-//swarm handles load test when given maximum requests rate and ramp up time.
-func (c *Client) swarm(rps float64, duration string) (string, error) {
+//Swarm handles load test when given maximum requests rate and ramp up time.
+func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 	// check if the locust is ready
 	if err := c.isReady(); err != nil {
-		return "", err
+		return &SwarmResponse{ Message: "Locust not ready", Success: false}, err
 	}
 
 	userCount := 1
@@ -194,32 +194,38 @@ func (c *Client) swarm(rps float64, duration string) (string, error) {
 	}
 
 	// generate load with 1 user to identify rps, this will be used to calculate rps later.
-	c.generateLoad(userCount, hatchRate)
+	c.GenerateLoad(userCount, hatchRate)
 
 	/// get rps for 1 user
-	initrps, err := c.totalRps()
+	initrps, err := c.getCurrentRps()
 	if err != nil {
-		return "", err
+		return &SwarmResponse{ Message: "Locust failed to generate load", Success: false}, err
 	}
 	currentRps := initrps
 
 	// timed wait and start ramping up load untill expected rps
 
 	for currentRps < targetRps {
-		userCount = +10
-		c.generateLoad(userCount, hatchRate)
-
-		// get rps for current execution
-		r, err := c.totalRps()
-		if err != nil {
-			return "", err
+		userTarget := calculateUsersTarget(targetRps,currentRps,userCount)
+		if userCount < userTarget {
+			userCount = +5
+		} else {
+			userCount = +1
 		}
 
-		for r < rps*float64(userCount)/2 {
+		c.GenerateLoad(userCount, hatchRate)
+
+		// get rps for current execution
+		r, err := c.getCurrentRps()
+		if err != nil {
+			return &SwarmResponse{ Message: "Failed to get current RPS from Locust for initial attempt", Success: false}, err
+		}
+
+		for r < initrps*float64(userCount)/2 {
 			// get rps for current number of usrs, sleep for two seconds if not expected rps is achive
-			r, err = c.totalRps()
+			r, err = c.getCurrentRps()
 			if err != nil {
-				return "", err
+				return &SwarmResponse{ Message: "Failed to get current RPS from Locust", Success: false}, err
 			}
 			time.Sleep(2 * time.Second)
 		}
@@ -229,13 +235,13 @@ func (c *Client) swarm(rps float64, duration string) (string, error) {
 
 	}
 
-	return "run", nil
+	return &SwarmResponse{ Message: "Started generating load", Success: true}, nil
 
 }
 
 // calculate users required for rps
-func calculateUsersTarget(targetrps int, currentrps int, currentusers int) int {
-	return targetrps / (currentrps / currentusers)
+func calculateUsersTarget(targetrps float64, currentrps float64, currentusers int) int {
+	return int(targetrps / (currentrps / float64(currentusers)))
 }
 
 // New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
