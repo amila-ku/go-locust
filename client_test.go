@@ -41,7 +41,7 @@ func TestNewClientURLSetting(t *testing.T) {
 	assert.Equal(t, locusturl, url)
 }
 
-func TestStartLoad(t *testing.T) {
+func TestGenerateLoad(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		req.ParseForm()
 		fmt.Fprint(w, locustTestStartedResponce)
