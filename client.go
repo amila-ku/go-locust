@@ -1,4 +1,6 @@
 // Package locust implements a locust client using native Go data structures
+// Locust API https://docs.locust.io/en/stable/api.html#
+// Locust endpoints https://github.com/locustio/locust/blob/master/locust/web.py
 package locust
 
 import (
@@ -11,12 +13,13 @@ import (
 	"time"
 )
 
-// defines the timeout value as 2 seconds
+// defines the timeout value of httpclient as 2 seconds
 const (
 	defaultTimeout = 2 * time.Second
 )
 
-// Client defines a structure for a locust client.
+// Client defines a structure for a locust client. 
+// Client contains URL of the locust endpoint and a httpclient
 type Client struct {
 	BaseURL    *url.URL
 	httpClient *http.Client
@@ -65,6 +68,27 @@ type Error struct {
 	Occurrences int    `json:"occurrences"`
 }
 
+// New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
+func New(endpoint string) (*Client, error) {
+	u, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, err
+	} else if u.Scheme == "" {
+		return nil, fmt.Errorf("invalid url, protocol scheme is empty")
+	} else if u.Host == "" {
+		return nil, fmt.Errorf("invalid url, host is empty")
+	}
+
+	client := Client{
+		BaseURL: u,
+		httpClient: &http.Client{
+			Timeout: defaultTimeout,
+		},
+	}
+
+	return &client, err
+}
+
 // GenerateLoad starts locust swarming or modifes if the load generation has already started,
 // hatch rate and number of users to simulate are inputs.
 func (c *Client) GenerateLoad(users int, hatchrate float64) (*SwarmResponse, error) {
@@ -74,7 +98,7 @@ func (c *Client) GenerateLoad(users int, hatchrate float64) (*SwarmResponse, err
 		return nil, err
 	}
 	// sets payload for post as hatch rate and user count
-	data := url.Values{"locust_count": {strconv.Itoa(users)}, "hatch_rate": {strconv.FormatFloat(hatchrate, 'E', -1, 32)}}
+	data := url.Values{"user_count": {strconv.Itoa(users)}, "hatch_rate": {strconv.FormatFloat(hatchrate, 'E', -1, 32)}}
 
 	resp, err := c.httpClient.PostForm(u.String(), data)
 	if err != nil {
@@ -242,25 +266,4 @@ func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 // calculate users required for rps
 func calculateUsersTarget(targetrps float64, currentrps float64, currentusers int) int {
 	return int(targetrps / (currentrps / float64(currentusers)))
-}
-
-// New initiantes a new client to control locust, url of the locust endpoint is required as a paramenter
-func New(endpoint string) (*Client, error) {
-	u, err := url.Parse(endpoint)
-	if err != nil {
-		return nil, err
-	} else if u.Scheme == "" {
-		return nil, fmt.Errorf("invalid url, protocol scheme is empty")
-	} else if u.Host == "" {
-		return nil, fmt.Errorf("invalid url, host is empty")
-	}
-
-	client := Client{
-		BaseURL: u,
-		httpClient: &http.Client{
-			Timeout: defaultTimeout,
-		},
-	}
-
-	return &client, err
 }
