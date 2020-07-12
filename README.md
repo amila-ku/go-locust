@@ -94,9 +94,9 @@ func main(){
 
 ```
 
-## Authintication
+## Authentication
 
-Library go-locust-client will not directly handle authentication. When creating http client configure http.Client to handle authentication for you. 
+Library go-locust-client will not directly handle authentication since locust does not require authentication. If you have implemented authetication mechanism handle it accordingly. As an example if Oauth2 is used when creating http client configure http.Client to handle authentication for you. 
 Check https://github.com/golang/oauth2 for implementation
 
 
