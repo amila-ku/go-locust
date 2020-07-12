@@ -2,7 +2,7 @@ before:
   hooks:
     - go mod download
 builds:
-  skip: true
+- skip: true
 checksum:
   name_template: 'checksums.txt'
 changelog:
