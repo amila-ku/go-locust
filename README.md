@@ -4,13 +4,17 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/amila-ku/go-locust-client)](https://goreportcard.com/report/github.com/amila-ku/go-locust-client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-go-locust-client is a library to control a locust deployment and get statistics. This is client allows to start/stop a locust load test and ramp up load test.
+## Description
+
+go-locust-client is a library to control a locust load generation and get statistics written in golang. This is client allows to start,stop a locust load test and ramp up load. This uses locust endpoints to cummunicate with locust.
 
 Currently, go-locust-client requires Go version 1.13 or greater and Locust 0.14 or higher. I will try my best to test with older versions of Go and Locust, but due time constraints, I haven't tested with older versions.
 
 This does not process client stats and presents information as it is.
 
 ## Usage 
+
+check example folder
 
 ```
 
@@ -41,11 +45,11 @@ func main(){
 
 ```
 
-* HostUrl : locust endpoiint to connect to, ex : http://locust.loadenv.io:8089
+* hostUrl : locust endpoiint to connect to, ex : http://locust.loadenv.io:8089
 
-* Users : Number of users to simulate
+* users : Number of users to simulate
 
-* HatchRate : How many users to be added per second
+* hatchRate : How many users to be added per second
 
 
 complete example:
@@ -57,30 +61,34 @@ import (
     lc "github.com/amila-ku/locust-client"
 )
 
-func main(){
+const (
+	 hostURL = "http://localhost:8089"
+	 users   = 5
+	 hatchRate = 1
+)
 
-    // create new client and check for errors
-	client, err := lc.New(HostUrl)
+func main(){
+	client, err := lc.New(hostURL)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-    // start load generation
-	_, err = client.startLoad(Users, HatchRate)
+	// start load generation
+	_, err = client.GenerateLoad(users, hatchRate)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
     // stop load generation
 	_, err = client.stopLoad()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
     // get loadtest status
 	_, err = client.getStatus()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 }
 
@@ -93,6 +101,7 @@ Check https://github.com/golang/oauth2 for implementation
 
 
 ## Run Locust
+
 
 install locust 
 
@@ -111,6 +120,12 @@ locust -f locust_files/my_locust_file.py
 
 ```
 
-## To Do
+## Contributing
 
-* add example
+If you are using the client and willing to add new functionality to it, you are welcome.
+
+Also check out [locust-operator](https://github.com/amila-ku/locust-operator) which makes running locust in a distributed setup makes easy.
+
+## License
+
+Open source licensed under the MIT license (see _LICENSE_ file for details).
