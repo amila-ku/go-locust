@@ -14,14 +14,30 @@ This does not process client stats and presents information as it is.
 
 ```
 
-	client, err := lc.New(HostUrl)
+package main
+
+import (
+	"log"
+	lc "github.com/amila-ku/go-locust-client"
+)
+
+const (
+	 hostURL = "http://localhost:8089"
+	 users   = 5
+	 hatchRate = 1
+)
+
+func main(){
+	client, err := lc.New(hostURL)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	_, err = client.StartLoad(Users, HatchRate)
+	_, err = client.GenerateLoad(users, hatchRate)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
+
+}
 
 ```
 
