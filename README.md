@@ -79,13 +79,13 @@ func main(){
 		log.Fatal(err)
 	}
 
-    // stop load generation
+    	// stop load generation
 	_, err = client.stopLoad()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-    // get loadtest status
+    	// get loadtest status
 	_, err = client.getStatus()
 	if err != nil {
 		log.Fatal(err)
