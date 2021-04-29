@@ -1,14 +1,14 @@
-# go-locust-client
+# go-locust
 
-![Build Status](https://github.com/amila-ku/go-locust-client/workflows/Go/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/amila-ku/go-locust-client)](https://goreportcard.com/report/github.com/amila-ku/go-locust-client)
+![Build Status](https://github.com/amila-ku/go-locust/workflows/Go/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/amila-ku/go-locust)](https://goreportcard.com/report/github.com/amila-ku/go-locust)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Description
 
-go-locust-client is a library to control a locust load generation and get statistics written in golang. This is client allows to start,stop a locust load test and ramp up load. This uses locust endpoints to cummunicate with locust.
+go-locust is a library to control a locust load generation and get statistics written in golang. This is client allows to start,stop a locust load test and ramp up load. This uses locust endpoints to cummunicate with locust.
 
-Currently, go-locust-client requires Go version 1.13 or greater and Locust 0.14 or higher. I will try my best to test with older versions of Go and Locust, but due time constraints, I haven't tested with older versions.
+Currently, go-locust requires Go version 1.13 or greater and Locust 0.14 or higher. I will try my best to test with older versions of Go and Locust, but due time constraints, I haven't tested with older versions.
 
 This does not process client stats and presents information as it is.
 
@@ -96,7 +96,7 @@ func main(){
 
 ## Authentication
 
-Library go-locust-client will not directly handle authentication since locust does not require authentication. If you have implemented authetication mechanism handle it accordingly. As an example if Oauth2 is used when creating http client configure http.Client to handle authentication for you. 
+Library go-locust will not directly handle authentication since locust does not require authentication. If you have implemented authetication mechanism handle it accordingly. As an example if Oauth2 is used when creating http client configure http.Client to handle authentication for you. 
 Check https://github.com/golang/oauth2 for implementation
 
 

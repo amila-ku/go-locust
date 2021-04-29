@@ -227,7 +227,7 @@ func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 	}
 	currentRps := initrps
 
-	// timed wait and start ramping up load untill expected rps
+	// timed wait and start ramping up load until expected rps
 
 	for currentRps < targetRps {
 		userTarget := calculateUsersTarget(targetRps, currentRps, userCount)
@@ -246,7 +246,7 @@ func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 		}
 
 		for r < initrps*float64(userCount)/2 {
-			// get rps for current number of usrs, sleep for two seconds if not expected rps is achive
+			// get rps for current number of usrs, sleep for two seconds if expected rps is not achieved.
 			r, err = c.getCurrentRps()
 			if err != nil {
 				return &SwarmResponse{Message: "Failed to get current RPS from Locust", Success: false}, err
