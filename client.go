@@ -13,12 +13,12 @@ import (
 	"time"
 )
 
-// defines the timeout value of httpclient as 2 seconds
+// defines the timeout value of httpclient as 10 seconds
 const (
-	defaultTimeout = 2 * time.Second
+	defaultTimeout = 10 * time.Second
 )
 
-// Client defines a structure for a locust client. 
+// Client defines a structure for a locust client.
 // Client contains URL of the locust endpoint and a httpclient
 type Client struct {
 	BaseURL    *url.URL
@@ -205,7 +205,7 @@ func (c *Client) getCurrentRps() (float64, error) {
 func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 	// check if the locust is ready
 	if err := c.isReady(); err != nil {
-		return &SwarmResponse{ Message: "Locust not ready", Success: false}, err
+		return &SwarmResponse{Message: "Locust not ready", Success: false}, err
 	}
 
 	userCount := 1
@@ -223,14 +223,14 @@ func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 	/// get rps for 1 user
 	initrps, err := c.getCurrentRps()
 	if err != nil {
-		return &SwarmResponse{ Message: "Locust failed to generate load", Success: false}, err
+		return &SwarmResponse{Message: "Locust failed to generate load", Success: false}, err
 	}
 	currentRps := initrps
 
 	// timed wait and start ramping up load untill expected rps
 
 	for currentRps < targetRps {
-		userTarget := calculateUsersTarget(targetRps,currentRps,userCount)
+		userTarget := calculateUsersTarget(targetRps, currentRps, userCount)
 		if userCount < userTarget {
 			userCount = +5
 		} else {
@@ -242,14 +242,14 @@ func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 		// get rps for current execution
 		r, err := c.getCurrentRps()
 		if err != nil {
-			return &SwarmResponse{ Message: "Failed to get current RPS from Locust for initial attempt", Success: false}, err
+			return &SwarmResponse{Message: "Failed to get current RPS from Locust for initial attempt", Success: false}, err
 		}
 
 		for r < initrps*float64(userCount)/2 {
 			// get rps for current number of usrs, sleep for two seconds if not expected rps is achive
 			r, err = c.getCurrentRps()
 			if err != nil {
-				return &SwarmResponse{ Message: "Failed to get current RPS from Locust", Success: false}, err
+				return &SwarmResponse{Message: "Failed to get current RPS from Locust", Success: false}, err
 			}
 			time.Sleep(2 * time.Second)
 		}
@@ -259,7 +259,7 @@ func (c *Client) Swarm(rps float64, duration string) (*SwarmResponse, error) {
 
 	}
 
-	return &SwarmResponse{ Message: "Started generating load", Success: true}, nil
+	return &SwarmResponse{Message: "Started generating load", Success: true}, nil
 
 }
 
