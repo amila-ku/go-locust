@@ -22,7 +22,7 @@ package main
 
 import (
 	"log"
-	lc "github.com/amila-ku/go-locust-client"
+	lc "github.com/amila-ku/go-locust"
 )
 
 const (
@@ -58,7 +58,7 @@ complete example:
 package main 
 
 import (
-    lc "github.com/amila-ku/locust-client"
+    lc "github.com/amila-ku/go-locust"
 )
 
 const (
